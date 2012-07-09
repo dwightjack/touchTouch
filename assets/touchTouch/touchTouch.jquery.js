@@ -11,7 +11,7 @@
 	/* Private variables */
 
 	var overlay = $('<div id="galleryOverlay">'),
-		slider = $('<div id="gallerySlider" class="gallery-slider">'),
+		slider = $('<div id="gallerySlider" class="gallery-slider" />'),
 		prevArrow = $('<a id="prevArrow" class="gallery-nav gallery-nav-prev" data-gallery-nav="prev"></a>'),
 		nextArrow = $('<a id="nextArrow" class="gallery-nav gallery-nav-prev" data-gallery-nav="next"></a>'),
 		overlayVisible = false,
@@ -58,14 +58,14 @@
 			});
 
 			// Listen for arrow keys
-			$(window).bind('keydown', function(e) {
+			$(window).bind('keydown.touchtouch', function(e) {
 
 				if (e.keyCode == 37) {
-					slider.trigger('prev.touchtouch');
+					slider.trigger('slide.touchtouch', 'prev');
 					//showPrevious();
 				}
 				else if (e.keyCode==39){
-					slider.trigger('next.touchtouch');
+					slider.trigger('slide.touchtouch', 'next');
 					//showNext();
 				}
 
@@ -79,7 +79,9 @@
 			});
 
 			// Appending the markup to the page
-			slider.appendTo(overlay);
+			overlay
+			.append(slider)
+			.append('<div class="gallery-caption"><span /></div>');
 
 			// If the browser does not have support
 			// for touch, display the arrows
@@ -143,15 +145,20 @@
 			});
 
 			img.attr('src',src);
+		},
+
+		defaults: {
+			showCaption: true
 		}
 	};
 
-	$.fn.touchTouch = function() {
+	$.fn.touchTouch = function(opts) {
 
 		var placeholders = '',
 			index = 0,
 			items = this,
-			galleryID = 'gallery-' + ($.guid++);
+			galleryID = 'gallery-' + ($.guid++),
+			options = $.extend({}, $.touchTouch.defaults, opts || {});
 
 		/* Private functions */
 
@@ -165,14 +172,16 @@
 
 		// Show image in the slider
 		function showImage(index){
-
+			var item;
 			// If the index is outside the bonds of the array
 			if(index < 0 || index >= items.length){
 				return false;
 			}
 
+			item = items.eq(index);
+
 			// Call the load function with the href attribute of the item
-			$.touchTouch.loadImage(items.eq(index).attr('href'), function() {
+			$.touchTouch.loadImage(item.attr('href'), function() {
 				placeholders.eq(index).html(this);
 			});
 		}
@@ -213,9 +222,6 @@
 			}
 		}
 
-
-
-
 		// Creating a placeholder for each image
 		$.each(items.get(), function() {
 			placeholders += '<div class="placeholder" />';
@@ -245,6 +251,10 @@
 					} else {
 						showPrevious();
 					}
+					if (options.showCaption) {
+						overlay.find('.gallery-caption span').html(items.eq(index).attr('title'));
+					}
+
 				});
 			}
 
@@ -254,6 +264,9 @@
 			index = items.index(this);
 			$.touchTouch.showOverlay(index);
 			showImage(index);
+			if (options.showCaption) {
+				overlay.find('.gallery-caption span').html($.attr(this, 'title'));
+			}
 
 			// Preload the next image
 			preload(index+1);
