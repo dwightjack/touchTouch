@@ -40,11 +40,11 @@
 
 					if (touch.pageX - startX > 10) {
 						slider.off('touchmove.touchtouch');
-						slider.trigger('prev.touchtouch');
+						slider.trigger('slide.touchtouch', 'prev');
 						//showPrevious();
 					} else if (touch.pageX - startX < -10) {
 						slider.off('touchmove.touchtouch');
-						slider.trigger('next.touchtouch');
+						slider.trigger('slide.touchtouch', 'next');
 						//showNext();
 					}
 				});
