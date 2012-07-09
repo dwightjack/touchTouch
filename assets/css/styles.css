@@ -50,7 +50,7 @@ header{
 	background-image: -moz-linear-gradient(top, #FFFFFF 0%, #EDEDED 100%);
 	background-image: -webkit-linear-gradient(top, #FFFFFF 0%, #EDEDED 100%);
 	background-image: -ms-linear-gradient(top, #FFFFFF 0%, #EDEDED 100%);
-	
+
 	padding:20px;
 	box-shadow:0 2px 4px rgba(0,0,0,0.3);
 }
@@ -76,13 +76,13 @@ header h2{
 	Thumbnails
 -----------------------------*/
 
-#thumbs{
+.thumbs{
 	width:480px;
 	margin:60px auto 35px;
 	text-align:center;
 }
 
-#thumbs a{
+.thumbs a{
 	width:120px;
 	height:120px;
 	display:inline-block;
@@ -92,16 +92,16 @@ header h2{
 	margin: 6px 6px 40px;
 	position:relative;
 	text-decoration:none;
-	
+
 	background-position:center center;
 	background-repeat: no-repeat;
-	
+
 	background-size:cover;
 	-moz-background-size:cover;
 	-webkit-background-size:cover;
 }
 
-#thumbs a:after{
+.thumbs a:after{
 	background-color: #303030;
     border-radius: 7px;
     bottom: -136px;
@@ -136,14 +136,14 @@ header h2{
 
 
 @media screen and (max-width: 960px) {
-	#thumbs, #credit{
+	.thumbs, #credit{
 		width:auto;
 	}
-	
+
 	footer{
 		display:none;
 	}
-	
+
 	#bsaHolder{
 		display:none;
 	}
