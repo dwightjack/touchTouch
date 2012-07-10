@@ -4,5 +4,7 @@ $(function(){
 	$('#thumbs a').touchTouch();
 
 	$('#thumbs2 a').touchTouch();
+	
+	$('#thumbs3 a').touchTouch();
 
 });

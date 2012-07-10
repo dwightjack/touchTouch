@@ -10,10 +10,10 @@
 
 	/* Private variables */
 
-	var overlay = $('<div id="galleryOverlay">'),
+	var overlay = $('<div id="galleryOverlay" class="gallery-overlay">'),
 		slider = $('<div id="gallerySlider" class="gallery-slider" />'),
 		prevArrow = $('<a id="prevArrow" class="gallery-nav gallery-nav-prev" data-gallery-nav="prev"></a>'),
-		nextArrow = $('<a id="nextArrow" class="gallery-nav gallery-nav-prev" data-gallery-nav="next"></a>'),
+		nextArrow = $('<a id="nextArrow" class="gallery-nav gallery-nav-next" data-gallery-nav="next"></a>'),
 		overlayVisible = false,
 		currentGalleryID;
 
@@ -98,9 +98,13 @@
 			overlay.hide().appendTo('body');
 		},
 
-		offsetSlider: function (index){
+		offsetSlider: function (index) {
+			var items = slider.find('.placeholder');
 			// This will trigger a smooth css transition
 			slider.css('left',(-index*100)+'%');
+			overlay.toggleClass('is-gallery-last', index+1 >= items.length);
+			overlay.toggleClass('is-gallery-first', index <= 0);
+			
 		},
 
 		showOverlay: function (index) {
@@ -148,7 +152,9 @@
 		},
 
 		defaults: {
-			showCaption: true
+			showCaption: true,
+			//galleryFilter: '[rel^="gallery"]', //TODO: unused right now
+			navigation: true
 		}
 	};
 
@@ -158,8 +164,8 @@
 			index = 0,
 			items = this,
 			galleryID = 'gallery-' + ($.guid++),
-			options = $.extend({}, $.touchTouch.defaults, opts || {});
-
+			options = $.extend({}, $.touchTouch.defaults, opts || {});		
+		
 		/* Private functions */
 
 
@@ -189,73 +195,89 @@
 		function showNext () {
 
 			// If this is not the last image
-			if(index+1 < items.length){
+			if (index+1 < items.length) {
 				index++;
 				$.touchTouch.offsetSlider(index);
 				preload(index+1);
-			}
-			else{
+			} else {
 				// Trigger the spring animation
 
 				slider.addClass('rightSpring');
 				setTimeout(function(){
 					slider.removeClass('rightSpring');
-				},500);
+				}, 500);
 			}
 		}
 
 		function showPrevious () {
 
 			// If this is not the first image
-			if(index>0){
+			if (index > 0) {
 				index--;
 				$.touchTouch.offsetSlider(index);
 				preload(index-1);
-			}
-			else{
+			} else {
 				// Trigger the spring animation
 
 				slider.addClass('leftSpring');
 				setTimeout(function(){
 					slider.removeClass('leftSpring');
-				},500);
+				}, 500);
 			}
+		}
+		
+		options.galleryID = galleryID;
+		
+		//check early for items already in a gallery
+		items = items.filter(function () {
+			return !$.data(this, 'touchtouch-gallery-id'); 
+		});
+		
+		if (items.length < 2) {
+			//force no navigation for single image galleries
+			options.navigation = false;	
 		}
 
 		// Creating a placeholder for each image
 		$.each(items.get(), function() {
-			placeholders += '<div class="placeholder" />';
+			placeholders += '<div class="placeholder gallery-placeholder" />';
 		});
 		placeholders = $(placeholders);
 
 		// Listening for clicks on the thumbnails
-
 		items
 		.data('touchtouch-gallery-id', galleryID)
+		.data('touchtouch-gallery', options)
 		.on('click.touchtouch', function(e) {
 
 			//get the galleryID
-			var galleryID = $.data(this, 'touchtouch-gallery-id');
+			var galleryID = $.data(this, 'touchtouch-gallery-id'),
+				galleryOptions = $.data(this, 'touchtouch-gallery');
 
 			e.preventDefault();
 
 			if (galleryID !== currentGalleryID) {
 				currentGalleryID = galleryID;
+				overlay.toggleClass('gallery-navigation', galleryOptions.navigation);
+				
 				slider
 				.empty()
 				.off('slide.touchtouch')
-				.append(placeholders)
-				.on('slide.touchtouch', function (e, dir) {
-					if (dir === 'next') {
-						showNext();
-					} else {
-						showPrevious();
-					}
-					if (options.showCaption) {
-						overlay.find('.gallery-caption span').html(items.eq(index).attr('title'));
-					}
-
-				});
+				.append(placeholders);
+				
+				if (galleryOptions.navigation) {
+					slider.on('slide.touchtouch', function (e, dir) {
+						if (dir === 'next') {
+							showNext();
+						} else {
+							showPrevious();
+						}
+						if (options.showCaption) {
+							overlay.find('.gallery-caption span').html(items.eq(index).attr('title'));
+						}
+	
+					});
+				}
 			}
 
 			// Find the position of this image
