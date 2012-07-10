@@ -1,0 +1,191 @@
+/* The gallery overlay */
+@import "compass/css3/";
+
+$gallery-overlay-color: #000 !default;
+$gallery-overlay-opacity: 0.8 !default;
+$gallery-preload-image: 'preloader.gif' !default;
+$gallery-preload-arrows: 'arrows.png' !default;
+
+$gallery-overlay-color-rgba: rgba($gallery-overlay-color, $gallery-overlay-opacity);
+$gallery-overlay-color-ie: ie-hex-str($gallery-overlay-color-rgba);
+
+
+.gallery-overlay {
+  
+  opacity: 0;
+  filter: alpha(opacity=0);
+  @include transition(opacity 1s ease);
+  
+	width: 100%;
+	height: 100%;
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 1000;
+	background-color: $gallery-overlay-color-rgba; 
+	overflow: hidden;
+	display: none;
+	
+  /* This class will trigger the animation */
+  &.is-visible {
+    //@include opacity(1); 
+    opacity: 1;
+    filter: alpha(opacity=100);
+  }
+
+}
+
+.gallery-caption {
+  
+  bottom: 10%;
+  color: #FFF;
+  position: fixed;
+  left:0;
+  text-align: center;
+  width: 100%;
+  
+  > span {
+    @include inline-block;
+    @include border-radius(1em);
+    
+    background-color: $gallery-overlay-color-rgba;
+    padding: 0.5em 1em;
+  }
+}
+
+.gallery-slider {
+  
+  @include transition(left 0.4s ease);
+  
+	height: 100%;
+	left: 0;
+	top: 0;
+	width: 100%;
+	white-space: nowrap;
+	position: absolute;
+	
+	.gallery-placeholder {
+	  @include inline-block;
+    
+    background: image-url($gallery-preload-image) no-repeat center center;
+    height: 100%;
+    line-height: 1px;
+    text-align: center;
+    width: 100%;
+
+    /* The before element moves the
+     * image halfway from the top */
+    &:before {
+      content: "";
+      display: inline-block;
+      height: 50%;
+      width: 1px;
+      margin-right: -1px;
+    }
+    
+    img{
+      display: inline-block;
+      max-height: 100%;
+      max-width: 100%;
+      vertical-align: middle;
+    }
+    
+  }
+  
+  &.gallery-move-right {
+    -webkit-animation: rightSpring 0.3s; /* Saf5, Chrome */
+     -moz-animation: rightSpring 0.3s; /* FF5+ */
+       -o-animation: rightSpring 0.3s; /* Opera 12+ */
+          animation: rightSpring 0.3s; /* Saf5, Chrome */
+  }
+  
+  &.gallery-move-left {
+     -webkit-animation: leftSpring 0.3s; /* Saf5, Chrome */
+     -moz-animation: leftSpring 0.3s; /* FF5+ */
+       -o-animation: leftSpring 0.3s; /* Opera 12+ */
+          animation: leftSpring 0.3s; /* Saf5, Chrome */
+  }
+	
+}
+
+/* Arrows */
+
+.gallery-nav {
+  
+  @include opacity(0.5);
+  @include transition(opacity 0.2s ease);
+  
+  border: none;
+  text-decoration: none;
+  background: image-url($gallery-preload-arrows) no-repeat;
+  cursor: pointer;
+  display: none;
+  position: absolute;
+  width: image-width($gallery-preload-arrows)/2;
+  height: image-height($gallery-preload-arrows);
+  top: 50%;
+  margin-top: 0-(image-height($gallery-preload-arrows)/2);
+  
+  &:hover{
+    @include opacity(1);
+  }
+  
+}
+.gallery-navigation .gallery-nav {
+  display: block;
+}
+
+.gallery-nav-prev {
+  background-position: left top;
+  left: 40px;
+}
+
+.gallery-nav-next {
+  background-position: right top;
+  right: 40px;
+}
+
+//navigation states
+.is-gallery-first .gallery-nav-prev,
+.is-gallery-last .gallery-nav-next {
+  display: none;
+}
+
+
+/* Firefox Keyframe Animations */
+
+@-moz-keyframes rightSpring{
+	0%{		margin-left:0px;}
+	50%{	margin-left:-30px;}
+	100%{	margin-left:0px;}
+}
+
+@-moz-keyframes leftSpring{
+	0%{		margin-left:0px;}
+	50%{	margin-left:30px;}
+	100%{	margin-left:0px;}
+}
+
+/* Safari and Chrome Keyframe Animations */
+
+@-webkit-keyframes rightSpring{
+	0%{		margin-left:0px;}
+	50%{	margin-left:-30px;}
+	100%{	margin-left:0px;}
+}
+
+@-webkit-keyframes leftSpring{
+	0%{		margin-left:0px;}
+	50%{	margin-left:30px;}
+	100%{	margin-left:0px;}
+}
+
+/* ie stuff */
+@media \0screen\,screen\9 {
+  .gallery-overlay.is-visible {
+    background: transparent;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#{$gallery-overlay-color-ie},endColorstr=#{$gallery-overlay-color-ie}); 
+    zoom: 1; 
+  }
+} 
+
