@@ -182,7 +182,9 @@ $gallery-overlay-color-ie: ie-hex-str($gallery-overlay-color-rgba);
 
 /* ie stuff */
 @media \0screen\,screen\9 {
-  .gallery-overlay.is-visible {
+  
+  .gallery-overlay.is-visible,
+  .gallery-caption > span {
     background: transparent;
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#{$gallery-overlay-color-ie},endColorstr=#{$gallery-overlay-color-ie}); 
     zoom: 1; 

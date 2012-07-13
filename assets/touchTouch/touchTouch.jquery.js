@@ -6,7 +6,7 @@
  * @license		MIT License
  */
 
-(function($, window){
+(function($, window, document, Modernizr){
 
 	/* Private variables */
 
@@ -16,11 +16,28 @@
 		nextArrow = $('<a id="nextArrow" class="gallery-nav gallery-nav-next" data-gallery-nav="next"></a>'),
 		overlayVisible = false,
 		currentGalleryID;
-
-
+		
+	function detectTransitions () {
+		//from modernizr
+		//https://github.com/Modernizr/Modernizr/blob/master/modernizr.js
+		var style = document.createElement('modernizr').style,
+			cssomPrefixes = 'Webkit Moz O ms'.split(' '),
+			ucProp  = 'Transition',
+            props   = ('transition ' + cssomPrefixes.join(ucProp + ' ') + ucProp).split(' ');
+            
+		for ( var i in props ) {
+			if ( style[ props[i] ] !== undefined ) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	/* Creating the plugin */
 
 	$.touchTouch = {
+		
+		supportTransitions : (Modernizr && Modernizr.hasOwnProperty('csstransitions') ? Modernizr.csstransitions : detectTransitions()),
 
 		init: function () {
 
@@ -58,13 +75,13 @@
 			});
 
 			// Listen for arrow keys
-			$(window).bind('keydown.touchtouch', function(e) {
+			//attached to document for IE compat
+			$(document).bind('keydown.touchtouch', function(e) {
 
 				if (e.keyCode == 37) {
 					slider.trigger('slide.touchtouch', 'prev');
 					//showPrevious();
-				}
-				else if (e.keyCode==39){
+				} else if (e.keyCode == 39) {
 					slider.trigger('slide.touchtouch', 'next');
 					//showNext();
 				}
@@ -97,13 +114,22 @@
 
 			overlay.hide().appendTo('body');
 		},
-
-		offsetSlider: function (index) {
-			var items = slider.find('.placeholder');
+		
+		//duration just works on js fallback
+		offsetSlider: function (index, duration) {
+			var items = slider.find('.placeholder')
+				left = (-index*100)+'%';
+				
 			// This will trigger a smooth css transition
-			slider.css('left',(-index*100)+'%');
-			overlay.toggleClass('is-gallery-last', index+1 >= items.length);
-			overlay.toggleClass('is-gallery-first', index <= 0);
+			if ($.touchTouch.supportTransitions) {
+				slider.css('left', left);
+			} else {
+				slider.stop(true, true).animate({'left': left}, (typeof duration !== 'undefined' ? duration : 400));
+			}
+			
+			overlay
+			.toggleClass('is-gallery-last', index+1 >= items.length)
+			.toggleClass('is-gallery-first', index <= 0);
 			
 		},
 
@@ -123,7 +149,7 @@
 			}, 100);
 
 			// Move the slider to the correct image
-			$.touchTouch.offsetSlider(index);
+			$.touchTouch.offsetSlider(index, 0);
 
 			// Raise the visible flag
 			overlayVisible = true;
@@ -262,6 +288,7 @@
 				
 				slider
 				.empty()
+				.css('left', 0)
 				.off('slide.touchtouch')
 				.append(placeholders);
 				
@@ -304,4 +331,4 @@
 
 	$(document).ready($.touchTouch.init);
 
-})(jQuery, this);
+})(jQuery, this, this.document, this.Modernizr);

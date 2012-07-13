@@ -217,7 +217,8 @@
 
 /* ie stuff */
 @media \0screen\,screen\9 {
-  .gallery-overlay.is-visible {
+  .gallery-overlay.is-visible,
+  .gallery-caption > span {
     background: transparent;
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#CC000000,endColorstr=#CC000000);
     zoom: 1;
